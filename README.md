@@ -12,7 +12,11 @@ Landing page para Froozy - Servicio B2B de vasos con hielo pre-envasados.
 
 ## 📧 Configuración del Envío de Emails
 
-### Opción 1: EmailJS (Recomendado - Sin backend)
+### ⚠️ Importante: Seguridad de Credenciales
+
+**NUNCA** pongas credenciales reales directamente en `script.js` ya que es código público. Usa una de estas opciones seguras:
+
+### Opción 1: EmailJS con configuración segura
 
 1. **Crea una cuenta en [EmailJS](https://www.emailjs.com/)**
 
@@ -38,18 +42,35 @@ Landing page para Froozy - Servicio B2B de vasos con hielo pre-envasados.
    - Ve a "Account" > "General"
    - Copia tu `Public Key`
 
-5. **Actualiza el archivo `script.js`:**
+5. **Configuración segura (elige una opción):**
+
+   **Opción A: Archivo config.js (NO versionado)**
    ```javascript
-   const EMAILJS_CONFIG = {
-       serviceId: 'tu_service_id_aqui',
-       templateId: 'tu_template_id_aqui', 
-       publicKey: 'tu_public_key_aqui'
+   // config.js (agregar a .gitignore)
+   window.EMAIL_CONFIG = {
+       serviceId: 'tu_service_id_real',
+       templateId: 'tu_template_id_real', 
+       publicKey: 'tu_public_key_real'
    };
    ```
+   
+   Luego incluye el archivo en HTML:
+   ```html
+   <script src="config.js"></script>
+   <script src="script.js"></script>
+   ```
 
-6. **Descomenta las líneas de EmailJS en `script.js`:**
-   - Busca los comentarios `/*` y `*/` alrededor del código de EmailJS
-   - Elimina los comentarios para activar el envío real
+   **Opción B: Variables de entorno (para hosting)**
+   - En Netlify: Site settings > Environment variables
+   - En Vercel: Project settings > Environment Variables
+   - Variables:
+     - `EMAILJS_SERVICE_ID`
+     - `EMAILJS_TEMPLATE_ID` 
+     - `EMAILJS_PUBLIC_KEY`
+
+6. **El código automáticamente detectará si las credenciales están configuradas:**
+   - ✅ Credenciales configuradas → Envío real de emails
+   - ⚠️ Sin credenciales → Modo simulado (para desarrollo)
 
 ### Opción 2: Formspree (Alternativa simple)
 

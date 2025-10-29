@@ -1,0 +1,17 @@
+// Archivo de ejemplo para configuración de EmailJS
+// 
+// INSTRUCCIONES:
+// 1. Copia este archivo como "config.js" (sin .example)
+// 2. Reemplaza los valores con tus credenciales reales de EmailJS
+// 3. NO subas el archivo config.js a Git (ya está en .gitignore)
+//
+// IMPORTANTE: Este archivo contiene credenciales, manténlo privado
+
+window.EMAIL_CONFIG = {
+    serviceId: 'tu_service_id_de_emailjs',     // Ejemplo: service_abc123
+    templateId: 'tu_template_id_de_emailjs',   // Ejemplo: template_xyz789
+    publicKey: 'tu_public_key_de_emailjs'      // Ejemplo: abcd1234efgh5678
+};
+
+// Una vez configurado correctamente, el formulario enviará emails reales
+// Si no configuras este archivo, funcionará en modo simulado

@@ -1,14 +1,26 @@
-// Configuración de EmailJS
+// Configuración de EmailJS - Variables de entorno para producción
 const EMAILJS_CONFIG = {
-    serviceId: 'TU_SERVICE_ID',  // Reemplazar con tu Service ID
-    templateId: 'TU_TEMPLATE_ID', // Reemplazar con tu Template ID
-    publicKey: 'TU_PUBLIC_KEY'    // Reemplazar con tu Public Key
+    serviceId: process.env.EMAILJS_SERVICE_ID || window.EMAIL_CONFIG?.serviceId || 'TU_SERVICE_ID',
+    templateId: process.env.EMAILJS_TEMPLATE_ID || window.EMAIL_CONFIG?.templateId || 'TU_TEMPLATE_ID', 
+    publicKey: process.env.EMAILJS_PUBLIC_KEY || window.EMAIL_CONFIG?.publicKey || 'TU_PUBLIC_KEY'
 };
+
+// Verificar si las credenciales están configuradas
+function areCredentialsConfigured() {
+    return EMAILJS_CONFIG.serviceId !== 'TU_SERVICE_ID' && 
+           EMAILJS_CONFIG.templateId !== 'TU_TEMPLATE_ID' && 
+           EMAILJS_CONFIG.publicKey !== 'TU_PUBLIC_KEY';
+}
 
 // Inicializar EmailJS cuando se carga la página
 document.addEventListener('DOMContentLoaded', function() {
-    // Inicializar EmailJS (descomenta cuando tengas las credenciales)
-    // emailjs.init(EMAILJS_CONFIG.publicKey);
+    // Inicializar EmailJS solo si las credenciales están configuradas
+    if (areCredentialsConfigured()) {
+        emailjs.init(EMAILJS_CONFIG.publicKey);
+        console.log('EmailJS inicializado correctamente');
+    } else {
+        console.warn('EmailJS no configurado - funcionando en modo simulado');
+    }
 });
 
 // Función de JS para manejar el envío del formulario
@@ -34,41 +46,34 @@ function handleFormSubmit(event) {
         hora: new Date().toLocaleTimeString('es-ES')
     };
 
-    // Opción 1: Envío con EmailJS (descomenta cuando configures)
-    /*
-    emailjs.send(EMAILJS_CONFIG.serviceId, EMAILJS_CONFIG.templateId, {
-        from_name: formData.nombreContacto,
-        from_email: formData.email,
-        business_name: formData.nombreLocal,
-        phone: formData.telefono,
-        message: `Nueva solicitud de contacto desde ${formData.nombreLocal}`,
-        reply_to: formData.email,
-        fecha: formData.fecha,
-        hora: formData.hora
-    })
-    .then(function(response) {
-        console.log('Email enviado exitosamente:', response);
-        showSuccessMessage(form, confirmation);
-    })
-    .catch(function(error) {
-        console.error('Error al enviar email:', error);
-        showErrorMessage(submitButton, originalButtonText);
-    });
-    */
-
-    // Opción 2: Envío simulado (actual - para desarrollo)
-    setTimeout(() => {
-        console.log('Datos de contacto B2B recopilados:', formData);
-        showSuccessMessage(form, confirmation);
-        
-        // Enviar datos a Google Analytics o similar para tracking
-        if (typeof gtag !== 'undefined') {
-            gtag('event', 'form_submit', {
-                event_category: 'Contact',
-                event_label: 'Froozy B2B Contact Form'
-            });
-        }
-    }, 1500); // Simular delay de red
+    // Opción 1: Envío con EmailJS (solo si las credenciales están configuradas)
+    if (areCredentialsConfigured()) {
+        emailjs.send(EMAILJS_CONFIG.serviceId, EMAILJS_CONFIG.templateId, {
+            from_name: formData.nombreContacto,
+            from_email: formData.email,
+            business_name: formData.nombreLocal,
+            phone: formData.telefono,
+            message: `Nueva solicitud de contacto desde ${formData.nombreLocal}`,
+            reply_to: formData.email,
+            fecha: formData.fecha,
+            hora: formData.hora
+        })
+        .then(function(response) {
+            console.log('Email enviado exitosamente:', response);
+            showSuccessMessage(form, confirmation);
+        })
+        .catch(function(error) {
+            console.error('Error al enviar email:', error);
+            showErrorMessage(submitButton, originalButtonText);
+        });
+    } else {
+        // Fallback: Modo simulado si no hay credenciales configuradas
+        console.warn('EmailJS no configurado - usando modo simulado');
+        setTimeout(() => {
+            console.log('Datos de contacto B2B recopilados (modo simulado):', formData);
+            showSuccessMessage(form, confirmation);
+        }, 1500);
+    }
 }
 
 // Función para mostrar mensaje de éxito
