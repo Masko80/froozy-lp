@@ -7,6 +7,8 @@
     <!-- Carga de Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+    <!-- EmailJS SDK -->
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
     <style>
         /* Definición de la fuente Inter y estilos personalizados */
         body {
@@ -180,7 +182,15 @@
                 
                 <!-- Mensaje de Confirmación (Oculto por defecto) -->
                 <div id="confirmationMessage" class="hidden mt-6 p-4 rounded-lg bg-green-600 text-white font-semibold">
-                    ¡Solicitud enviada con éxito! Pronto nos contactaremos para coordinar tu demo de Froozy.
+                    <div class="flex items-center">
+                        <svg class="w-6 h-6 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                        </svg>
+                        <div>
+                            <strong>¡Solicitud enviada con éxito!</strong>
+                            <p class="text-sm mt-1">Nuestro equipo de Froozy se contactará contigo en las próximas 24 horas para coordinar tu demo personalizada y discutir precios especiales.</p>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
