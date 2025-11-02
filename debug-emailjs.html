@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debug EmailJS - Froozy</title>
+    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Courier New', monospace;
+            background: #1a1a1a;
+            color: #00ff00;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: #0a0a0a;
+            border: 2px solid #00ff00;
+            padding: 30px;
+            border-radius: 10px;
+        }
+        h1 {
+            color: #00ff00;
+            text-align: center;
+            margin-bottom: 30px;
+            text-shadow: 0 0 10px #00ff00;
+        }
+        .section {
+            margin: 20px 0;
+            padding: 15px;
+            background: #151515;
+            border-left: 3px solid #00ff00;
+        }
+        .section h2 {
+            color: #00ff00;
+            font-size: 18px;
+            margin-bottom: 10px;
+        }
+        .log {
+            font-size: 13px;
+            white-space: pre-wrap;
+            word-break: break-all;
+        }
+        .success { color: #00ff00; }
+        .error { color: #ff0000; }
+        .warning { color: #ffaa00; }
+        .info { color: #00aaff; }
+        button {
+            background: #00ff00;
+            color: #000;
+            border: none;
+            padding: 15px 30px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            border-radius: 5px;
+            margin: 10px 5px;
+            font-family: 'Courier New', monospace;
+            text-transform: uppercase;
+        }
+        button:hover {
+            background: #00cc00;
+            box-shadow: 0 0 20px #00ff00;
+        }
+        button:disabled {
+            background: #666;
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+        .btn-container {
+            text-align: center;
+            margin: 20px 0;
+        }
+        hr {
+            border: none;
+            border-top: 1px solid #00ff00;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔍 DEBUG EMAILJS - DIAGNÓSTICO COMPLETO</h1>
+        
+        <div class="section">
+            <h2>📋 PASO 1: Verificar Carga de Archivos</h2>
+            <div id="step1" class="log">Verificando...</div>
+        </div>
+
+        <div class="section">
+            <h2>🔑 PASO 2: Verificar Credenciales</h2>
+            <div id="step2" class="log">Esperando paso 1...</div>
+        </div>
+
+        <div class="section">
+            <h2>⚙️ PASO 3: Inicializar EmailJS</h2>
+            <div id="step3" class="log">Esperando paso 2...</div>
+        </div>
+
+        <div class="section">
+            <h2>📤 PASO 4: Enviar Email de Prueba</h2>
+            <div id="step4" class="log">Esperando inicialización...</div>
+            <div class="btn-container">
+                <button id="testBtn" onclick="sendTestEmail()" disabled>🚀 ENVIAR EMAIL DE PRUEBA</button>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>📊 RESULTADO FINAL</h2>
+            <div id="result" class="log">Esperando prueba...</div>
+        </div>
+
+        <hr>
+        <div style="text-align: center; color: #666; font-size: 12px;">
+            Abre la Consola del Navegador (F12) para ver más detalles técnicos
+        </div>
+    </div>
+
+    <script src="config.js"></script>
+    <script>
+        let testConfig = null;
+
+        // PASO 1: Verificar carga de archivos
+        function step1() {
+            const step1Div = document.getElementById('step1');
+            let log = '';
+
+            log += '✓ EmailJS SDK cargado: ' + (typeof emailjs !== 'undefined' ? '✅ SI' : '❌ NO') + '\n';
+            log += '✓ config.js cargado: ' + (typeof window.EMAIL_CONFIG !== 'undefined' ? '✅ SI' : '❌ NO') + '\n';
+            
+            if (typeof emailjs === 'undefined') {
+                log += '\n❌ ERROR CRÍTICO: EmailJS SDK no está cargado\n';
+                log += '   Solución: Verifica la conexión a internet\n';
+                step1Div.innerHTML = '<span class="error">' + log + '</span>';
+                return false;
+            }
+
+            if (typeof window.EMAIL_CONFIG === 'undefined') {
+                log += '\n❌ ERROR CRÍTICO: config.js no está disponible\n';
+                log += '   Solución: Verifica que config.js existe en la carpeta\n';
+                step1Div.innerHTML = '<span class="error">' + log + '</span>';
+                return false;
+            }
+
+            log += '\n✅ Todos los archivos cargados correctamente';
+            step1Div.innerHTML = '<span class="success">' + log + '</span>';
+            
+            console.log('=== PASO 1 COMPLETADO ===');
+            return true;
+        }
+
+        // PASO 2: Verificar credenciales
+        function step2() {
+            const step2Div = document.getElementById('step2');
+            const config = window.EMAIL_CONFIG;
+            
+            let log = '';
+            log += 'Service ID: ' + (config.serviceId || '❌ NO CONFIGURADO') + '\n';
+            log += 'Template ID: ' + (config.templateId || '❌ NO CONFIGURADO') + '\n';
+            log += 'Public Key: ' + (config.publicKey ? '✅ ***' + config.publicKey.slice(-4) : '❌ NO CONFIGURADO') + '\n\n';
+
+            const allConfigured = config.serviceId && config.templateId && config.publicKey;
+
+            if (!allConfigured) {
+                log += '❌ ERROR: Faltan credenciales en config.js\n';
+                log += '   Solución: Verifica que todos los campos tengan valores reales\n';
+                step2Div.innerHTML = '<span class="error">' + log + '</span>';
+                return false;
+            }
+
+            if (config.serviceId === 'tu_service_id_de_emailjs' || 
+                config.serviceId === 'TU_SERVICE_ID_AQUI') {
+                log += '⚠️ ADVERTENCIA: Parece que estás usando valores de ejemplo\n';
+                log += '   Solución: Reemplaza con tus credenciales reales de EmailJS\n';
+                step2Div.innerHTML = '<span class="warning">' + log + '</span>';
+                return false;
+            }
+
+            testConfig = {
+                serviceId: config.serviceId,
+                templateId: config.templateId,
+                publicKey: config.publicKey
+            };
+
+            log += '✅ Todas las credenciales configuradas correctamente';
+            step2Div.innerHTML = '<span class="success">' + log + '</span>';
+            
+            console.log('=== PASO 2 COMPLETADO ===');
+            console.log('Config:', testConfig);
+            return true;
+        }
+
+        // PASO 3: Inicializar EmailJS
+        function step3() {
+            const step3Div = document.getElementById('step3');
+            let log = 'Intentando inicializar EmailJS...\n\n';
+
+            try {
+                emailjs.init(testConfig.publicKey);
+                log += '✅ EmailJS inicializado correctamente\n';
+                log += '   Public Key aceptada: ***' + testConfig.publicKey.slice(-4) + '\n';
+                step3Div.innerHTML = '<span class="success">' + log + '</span>';
+                
+                document.getElementById('testBtn').disabled = false;
+                
+                console.log('=== PASO 3 COMPLETADO ===');
+                return true;
+            } catch (error) {
+                log += '❌ ERROR al inicializar EmailJS\n';
+                log += '   Error: ' + error.message + '\n';
+                log += '   Solución: Verifica que la Public Key sea correcta\n';
+                step3Div.innerHTML = '<span class="error">' + log + '</span>';
+                console.error('Error en paso 3:', error);
+                return false;
+            }
+        }
+
+        // PASO 4: Enviar email de prueba
+        async function sendTestEmail() {
+            const step4Div = document.getElementById('step4');
+            const resultDiv = document.getElementById('result');
+            const btn = document.getElementById('testBtn');
+            
+            btn.disabled = true;
+            btn.textContent = '⏳ ENVIANDO...';
+            
+            let log = 'Preparando envío de email...\n\n';
+            step4Div.innerHTML = '<span class="info">' + log + '</span>';
+
+            const testData = {
+                from_name: 'Debug Test',
+                from_email: 'debug@froozy.com',
+                business_name: 'Test Negocio Debug',
+                phone: '+56912345678',
+                message: 'Email de prueba del sistema de debug',
+                reply_to: 'debug@froozy.com',
+                fecha: new Date().toLocaleDateString('es-ES'),
+                hora: new Date().toLocaleTimeString('es-ES')
+            };
+
+            log += 'Datos a enviar:\n';
+            log += JSON.stringify(testData, null, 2) + '\n\n';
+            log += 'Service ID: ' + testConfig.serviceId + '\n';
+            log += 'Template ID: ' + testConfig.templateId + '\n\n';
+            log += '📤 Enviando a EmailJS...\n';
+            
+            step4Div.innerHTML = '<span class="info">' + log + '</span>';
+
+            try {
+                console.log('=== ENVIANDO EMAIL ===');
+                console.log('Config:', testConfig);
+                console.log('Data:', testData);
+
+                const response = await emailjs.send(
+                    testConfig.serviceId,
+                    testConfig.templateId,
+                    testData
+                );
+
+                console.log('=== RESPUESTA EXITOSA ===');
+                console.log('Response:', response);
+
+                log += '\n✅ EMAIL ENVIADO EXITOSAMENTE!\n\n';
+                log += 'Detalles de la respuesta:\n';
+                log += '  Status: ' + response.status + '\n';
+                log += '  Text: ' + response.text + '\n\n';
+                log += '📧 Revisa tu bandeja de entrada (o spam)\n';
+                
+                step4Div.innerHTML = '<span class="success">' + log + '</span>';
+                
+                resultDiv.innerHTML = '<span class="success">✅ ¡TODO FUNCIONA CORRECTAMENTE!\n\n' +
+                    'Tu configuración de EmailJS está perfecta.\n' +
+                    'El problema puede estar en:\n' +
+                    '1. El formulario del index.html\n' +
+                    '2. El orden de carga de scripts\n' +
+                    '3. El evento de submit del formulario</span>';
+
+            } catch (error) {
+                console.error('=== ERROR AL ENVIAR ===');
+                console.error('Error completo:', error);
+                console.error('Error tipo:', typeof error);
+                console.error('Error JSON:', JSON.stringify(error, null, 2));
+
+                log += '\n❌ ERROR AL ENVIAR EMAIL\n\n';
+                log += 'Detalles del error:\n';
+                log += '  Text: ' + (error.text || 'N/A') + '\n';
+                log += '  Status: ' + (error.status || 'N/A') + '\n';
+                log += '  Message: ' + (error.message || 'N/A') + '\n\n';
+
+                let solution = '💡 SOLUCIÓN:\n';
+                
+                if (error.text && error.text.includes('recipients address is empty')) {
+                    solution += '❌ El template NO tiene configurado el destinatario (To Email)\n\n';
+                    solution += 'Pasos para solucionar:\n';
+                    solution += '1. Ve a: https://dashboard.emailjs.com/admin/templates/' + testConfig.templateId + '\n';
+                    solution += '2. Click en la pestaña "Settings"\n';
+                    solution += '3. En el campo "To Email" escribe tu email\n';
+                    solution += '4. Guarda el template\n';
+                    solution += '5. Vuelve a probar\n';
+                } else if (error.text && error.text.includes('Template not found')) {
+                    solution += '❌ El Template ID no existe\n';
+                    solution += '   Verifica el ID en: https://dashboard.emailjs.com/admin/templates\n';
+                } else if (error.text && error.text.includes('Service not found')) {
+                    solution += '❌ El Service ID no existe\n';
+                    solution += '   Verifica el ID en: https://dashboard.emailjs.com/admin/email-services\n';
+                } else if (error.status === 412) {
+                    solution += '❌ Error 412: Gmail no tiene permisos suficientes\n';
+                    solution += '   1. Elimina el servicio de Gmail en EmailJS\n';
+                    solution += '   2. Vuélvelo a conectar autorizando TODOS los permisos\n';
+                } else {
+                    solution += 'Error desconocido. Revisa la consola del navegador.\n';
+                }
+
+                step4Div.innerHTML = '<span class="error">' + log + '</span>';
+                resultDiv.innerHTML = '<span class="error">' + solution + '</span>';
+
+            } finally {
+                btn.disabled = false;
+                btn.textContent = '🚀 ENVIAR EMAIL DE PRUEBA';
+            }
+        }
+
+        // Ejecutar diagnóstico al cargar
+        window.addEventListener('DOMContentLoaded', () => {
+            console.log('=== INICIANDO DIAGNÓSTICO COMPLETO ===');
+            
+            setTimeout(() => {
+                if (step1()) {
+                    setTimeout(() => {
+                        if (step2()) {
+                            setTimeout(() => {
+                                step3();
+                            }, 500);
+                        }
+                    }, 500);
+                }
+            }, 500);
+        });
+    </script>
+</body>
+</html>

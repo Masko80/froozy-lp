@@ -7,8 +7,6 @@
     <!-- Carga de Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
-    <!-- EmailJS SDK -->
-    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
     <!-- Estilos personalizados -->
     <link rel="stylesheet" href="styles.css">
 </head>
@@ -163,9 +161,9 @@
         </div>
     </footer>
 
-    <!-- Configuración de EmailJS (archivo local no versionado) -->
+    <!-- Cargar scripts en orden: EmailJS SDK → Config → Script principal -->
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
     <script src="config.js"></script>
-    <!-- Scripts principales -->
     <script src="script.js"></script>
 </body>
 </html>
